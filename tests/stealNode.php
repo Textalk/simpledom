@@ -48,4 +48,22 @@ class SimpleDOM_TestCase_stealNode extends PHPUnit_Framework_TestCase
 
 		$this->assertXmlStringEqualsXmlString($expected, $root->asXML());
 	}
+
+	public function testMultipleDocuments()
+	{
+		$doc1 = new SimpleDOM('<doc1 />');
+		$doc2 = new SimpleDOM('<doc2><child1 /><child2 /><child3 /></doc2>');
+
+		$doc1->stealNode($doc2->child2);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc1><child2 /></doc1>',
+			$doc1->asXML()
+		);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc2><child1 /><child3 /></doc2>',
+			$doc2->asXML()
+		);
+	}
 }

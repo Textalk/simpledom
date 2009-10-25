@@ -395,7 +395,7 @@ class SimpleDOM extends SimpleXMLElement
 
 		foreach ($src->childNodes as $child)
 		{
-			$dst->appendChild($dst->ownerDocument->importNode($child->cloneNode(true)));
+			$dst->appendChild($dst->ownerDocument->importNode($child->cloneNode(true), true));
 		}
 
 		return $this;
@@ -411,11 +411,12 @@ class SimpleDOM extends SimpleXMLElement
 	{
 		$src = dom_import_simplexml($src);
 		$dst = dom_import_simplexml($this);
+		$doc = $dst->ownerDocument;
 
 		while ($src->childNodes->length)
 		{
 			$child = $src->childNodes->item(0);
-			$dst->appendChild($child->parentNode->removeChild($child));
+			$dst->appendChild($doc->importNode($child->parentNode->removeChild($child), true));
 		}
 
 		return $this;
@@ -432,7 +433,7 @@ class SimpleDOM extends SimpleXMLElement
 		$dst  = dom_import_simplexml($this);
 		$node = dom_import_simplexml($node);
 
-		return simplexml_import_dom($dst->appendChild($node->parentNode->removeChild($node)), get_class($this));
+		return simplexml_import_dom($dst->appendChild($dst->ownerDocument->importNode($node->parentNode->removeChild($node), true)), get_class($this));
 	}
 
 	/**
@@ -606,6 +607,11 @@ class SimpleDOM extends SimpleXMLElement
 		return $this;
 	}
 
+
+	//=================================
+	// Utilities
+	//
+
 	/**
 	* Return the current element as a DOMElement
 	*
@@ -614,6 +620,67 @@ class SimpleDOM extends SimpleXMLElement
 	public function asDOM()
 	{
 		return dom_import_simplexml($this);
+	}
+
+	/**
+	* 
+	*
+	* @return	void
+	*/
+	public function asPrettyXML($filepath = null)
+	{
+		$xml = dom_import_simplexml($this);
+
+		$xsl = new DOMDocument;
+		$xsl->loadXML(
+'<?xml version="1.0" encoding="utf-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:s9e="urn:s9e">
+
+	<xsl:output method="xml" encoding="utf-8" indent="yes" />
+
+	<xsl:template match="node()">
+		<xsl:copy>
+			<xsl:copy-of select="@*" />
+			<xsl:apply-templates />
+		</xsl:copy>
+	</xsl:template>
+
+</xsl:stylesheet>');
+
+		$xslt = new XSLTProcessor;
+		$xslt->importStylesheet($xsl);
+
+		if (isset($filepath))
+		{
+			return $xslt->transformToURI($xml, $filepath);
+		}
+		else
+		{
+			return $xslt->transformToXML($xml);
+		}
+	}
+
+	/**
+	* 
+	*
+	* @return	void
+	*/
+	public function XSLT($filepath)
+	{
+		if (extension_loaded('xslcache'))
+		{
+			$xslt = new XSLTProcessor($filepath);
+		}
+		else
+		{
+			$xsl = new DOMDocument;
+			$xsl->load($filepath);
+
+			$xslt = new XSLTProcessor;
+			$xslt->importStylesheet($xsl);
+		}
+
+		return $xslt->transformToXML(dom_import_simplexml($this));
 	}
 
 
