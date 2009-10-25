@@ -388,14 +388,14 @@ class SimpleDOM extends SimpleXMLElement
 	* @param	SimpleXMLElement	$src	Source node
 	* @return	SimpleDOM					Current node
 	*/
-	public function copyChildrenFrom(SimpleXMLElement $src)
+	public function cloneChildrenFrom(SimpleXMLElement $src)
 	{
 		$src = dom_import_simplexml($src);
 		$dst = dom_import_simplexml($this);
 
 		foreach ($src->childNodes as $child)
 		{
-			$dst->appendChild($child->cloneNode(true));
+			$dst->appendChild($dst->ownerDocument->importNode($child->cloneNode(true)));
 		}
 
 		return $this;
