@@ -31,10 +31,7 @@ class SimpleDOM extends SimpleXMLElement
 	public function __call($name, $args)
 	{
 		$passthrough = array(
-			'appendChild'	=> 'insert',
-			'insertBefore'	=> 'insert',
-			'replaceChild'	=> 'insert',
-
+			// From DOMElement
 			'getAttribute'				=> 'method',
 			'getAttributeNS'			=> 'method',
 			'getElementsByTagName'		=> 'method',
@@ -43,10 +40,24 @@ class SimpleDOM extends SimpleXMLElement
 			'hasAttributeNS'			=> 'method',
 			'removeAttribute'			=> 'method',
 			'removeAttributeNS'			=> 'method',
-			'removeChild'				=> 'method',
 			'setAttribute'				=> 'method',
 			'setAttributeNS'			=> 'method',
 
+			// From DOMNode
+			'appendChild'		=> 'insert',
+			'insertBefore'		=> 'insert',
+			'replaceChild'		=> 'insert',
+			'cloneNode'			=> 'method',
+			'getLineNo'			=> 'method',
+			'hasAttributes'		=> 'method',
+			'hasChildNodes'		=> 'method',
+			'isSameNode'		=> 'method',
+			'lookupNamespaceURI'=> 'method',
+			'lookupPrefix'		=> 'method',
+			'normalize'			=> 'method',
+			'removeChild'		=> 'method',
+
+			
 			'nodeName'			=> 'property',
 			'nodeValue'			=> 'property',
 			'nodeType'			=> 'property',
@@ -460,6 +471,17 @@ class SimpleDOM extends SimpleXMLElement
 	*
 	* @return	void
 	*/
+	public function insertCDATA($text, $mode = 'append')
+	{
+		$this->insert('CDATASection', $text, $mode);
+		return $this;
+	}
+
+	/**
+	* 
+	*
+	* @return	void
+	*/
 	public function insertComment($text, $mode = 'append')
 	{
 		$this->insert('Comment', $text, $mode);
@@ -572,9 +594,9 @@ class SimpleDOM extends SimpleXMLElement
 
 				$data = substr($str, 0, -1);
 			}
-			elseif (!is_string($data))
+			else
 			{
-				throw new InvalidArgumentException('Argument 2 passed to addProcessingInstruction() must be an array or a string, ' . gettype($xml) . ' given');
+				$data = (string) $data;
 			}
 
 			$pi = $doc->createProcessingInstruction($target, $data);
@@ -610,7 +632,7 @@ class SimpleDOM extends SimpleXMLElement
 
 	//=================================
 	// Utilities
-	//
+	//=================================
 
 	/**
 	* Return the current element as a DOMElement
@@ -634,9 +656,9 @@ class SimpleDOM extends SimpleXMLElement
 		$xsl = new DOMDocument;
 		$xsl->loadXML(
 '<?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:s9e="urn:s9e">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-	<xsl:output method="xml" encoding="utf-8" indent="yes" />
+	<xsl:output method="xml" indent="yes" />
 
 	<xsl:template match="node()">
 		<xsl:copy>
@@ -661,15 +683,18 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
-	* 
+	* Transform current node and return the result
 	*
-	* @return	void
+	* Will take advantage of PECL's xslcache if available
+	*
+	* @param	string	$filepath	Path to stylesheet
+	* @return	string				Result
 	*/
 	public function XSLT($filepath)
 	{
 		if (extension_loaded('xslcache'))
 		{
-			$xslt = new XSLTProcessor($filepath);
+			$xslt = new XSLTCache($filepath);
 		}
 		else
 		{
