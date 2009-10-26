@@ -72,6 +72,9 @@ class SimpleDOM_TestCase_insertPI extends PHPUnit_Framework_TestCase
 		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
 	}
 
+	/**
+	* @expectedException DOMException
+	*/
 	public function testInvalidTarget()
 	{
 		$root = new SimpleDOM('<root />');
@@ -79,57 +82,11 @@ class SimpleDOM_TestCase_insertPI extends PHPUnit_Framework_TestCase
 		try
 		{
 			$root->insertPI('$$$', 'type="text/xsl" href="foo.xsl"');
-			$fail = true;
 		}
 		catch (DOMException $e)
 		{
 			$this->assertSame($e->code, DOM_INVALID_CHARACTER_ERR);
-			$fail = false;
-		}
-
-		if ($fail)
-		{
-			self::fail();
-		}
-	}
-
-	public function testInvalidArgumentType1()
-	{
-		$root = new SimpleDOM('<root />');
-
-		try
-		{
-			$root->insertPI(false, 'type="text/xsl" href="foo.xsl"');
-			$fail = true;
-		}
-		catch (Exception $e)
-		{
-			$fail = false;
-		}
-
-		if ($fail)
-		{
-			self::fail();
-		}
-	}
-
-	public function testInvalidArgumentType2()
-	{
-		$root = new SimpleDOM('<root />');
-
-		try
-		{
-			$root->insertPI('xml-stylesheet', false);
-			$fail = true;
-		}
-		catch (Exception $e)
-		{
-			$fail = false;
-		}
-
-		if ($fail)
-		{
-			self::fail();
+			throw $e;
 		}
 	}
 }
