@@ -142,24 +142,6 @@ class SimpleDOM extends SimpleXMLElement
 	//=================================
 
 	/**
-	* Add a new child after a reference node
-	*
-	* @param	SimpleXMLElement	$new	New node
-	* @param	SimpleXMLElement	$ref	Reference node
-	* @return	SimpleDOM					The inserted node
-	*/
-	public function insertAfter(SimpleXMLElement $new, SimpleXMLElement $ref = null)
-	{
-		if (!isset($ref)
-		 || !($next = dom_import_simplexml($ref)->nextSibling))
-		{
-			return $this->appendChild($new);
-		}
-
-		return $this->insertBefore($new, $next);
-	}
-
-	/**
 	* Add a new sibling before this node
 	*
 	* This is a convenience method. The same result can be achieved with
@@ -173,18 +155,9 @@ class SimpleDOM extends SimpleXMLElement
 	public function insertBeforeSelf(SimpleXMLElement $new)
 	{
 		$tmp = dom_import_simplexml($this);
-		$new = $tmp->ownerDocument->importNode(dom_import_simplexml($new), true);
+		$node = $tmp->ownerDocument->importNode(dom_import_simplexml($new), true);
 
-		/**
-		* We don't want to insert anything before the root node
-		*/
-		if ($tmp === $tmp->ownerDocument->documentElement)
-		{
-			throw new BadMethodCallException('insertBeforeSelf() cannot be used to insert nodes outside of the root node');
-		}
-
-		$node = $tmp->parentNode->insertBefore($new, $tmp);
-		return simplexml_import_dom($node, get_class($this));
+		return simplexml_import_dom($this->insertNode($tmp, $node, 'before'), get_class($this));
 	}
 
 	/**
@@ -201,26 +174,9 @@ class SimpleDOM extends SimpleXMLElement
 	public function insertAfterSelf(SimpleXMLElement $new)
 	{
 		$tmp = dom_import_simplexml($this);
-		$new = $tmp->ownerDocument->importNode(dom_import_simplexml($new), true);
+		$node = $tmp->ownerDocument->importNode(dom_import_simplexml($new), true);
 
-		/**
-		* We don't want to insert anything after the root node
-		*/
-		if ($tmp === $tmp->ownerDocument->documentElement)
-		{
-			throw new BadMethodCallException('insertAfterSelf() cannot be used to insert nodes outside of the root node');
-		}
-
-		if (isset($tmp->nextSibling))
-		{
-			$node = $tmp->parentNode->insertBefore($new, $tmp->nextSibling);
-		}
-		else
-		{
-			$node = $tmp->parentNode->appendChild($new);
-		}
-
-		return simplexml_import_dom($node, get_class($this));
+		return simplexml_import_dom($this->insertNode($tmp, $node, 'after'), get_class($this));
 	}
 
 	/**
@@ -381,15 +337,23 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Copy all attributes from a node to current node
 	*
-	* @param	SimpleXMLElement	$src	Source node
-	* @return	SimpleDOM					Current node
+	* @param	SimpleXMLElement	$src		Source node
+	* @param	bool				$overwrite	If TRUE, overwrite existing attributes.
+	*											Otherwise, ignore duplicate attributes
+	* @return	SimpleDOM						Current node
 	*/
-	public function copyAttributesFrom(SimpleXMLElement $src)
+	public function copyAttributesFrom(SimpleXMLElement $src, $overwrite = true)
 	{
+		$dom = dom_import_simplexml($this);
+
 		foreach (dom_import_simplexml($src)->attributes as $attr)
 		{
-			$this->addAttribute($attr->nodeName, $attr->nodeValue, $attr->namespaceURI);
+			if ($overwrite || !$dom->hasAttributeNS($attr->namespaceURI, $attr->nodeName))
+			{
+				$dom->setAttributeNS($attr->namespaceURI, $attr->nodeName, $attr->nodeValue);
+			}
 		}
+
 		return $this;
 	}
 
@@ -467,58 +431,58 @@ class SimpleDOM extends SimpleXMLElement
 	//=================================
 
 	/**
-	* 
+	* Insert a CDATA section
 	*
-	* @return	void
+	* @param	string		$content	CDATA content
+	* @param	string		$mode		Where to add this node: 'append' to current node,
+	*									'before' current node or 'after' current node
+	* @return	SimpleDOM				Current node
 	*/
-	public function insertCDATA($text, $mode = 'append')
+	public function insertCDATA($content, $mode = 'append')
 	{
-		$this->insert('CDATASection', $text, $mode);
+		$this->insert('CDATASection', $content, $mode);
 		return $this;
 	}
 
 	/**
-	* 
+	* Insert a comment node
 	*
-	* @return	void
+	* @param	string		$content	Comment content
+	* @param	string		$mode		Where to add this node: 'append' to current node,
+	*									'before' current node or 'after' current node
+	* @return	SimpleDOM				Current node
 	*/
-	public function insertComment($text, $mode = 'append')
+	public function insertComment($content, $mode = 'append')
 	{
-		$this->insert('Comment', $text, $mode);
+		$this->insert('Comment', $content, $mode);
 		return $this;
 	}
 
 	/**
-	* 
+	* Insert a text node
 	*
-	* @param	string		$text	Text to append
+	* @param	string		$content	CDATA content
+	* @param	string		$mode		Where to add this node: 'append' to current node,
+	*									'before' current node or 'after' current node
+	* @return	SimpleDOM				Current node
+	*/
+	public function insertText($content, $mode = 'append')
+	{
+		$this->insert('TextNode', $content, $mode);
+		return $this;
+	}
+
+
+	/**
+	* Insert raw XML data
+	*
+	* @param	string		$xml	XML to insert
+	* @param	string		$mode	Where to add this tag: 'append' to current node,
+	*								'before' current node or 'after' current node
 	* @return	SimpleDOM			Current node
-	*/
-	public function insertText($text, $mode = 'append')
-	{
-		$this->insert('TextNode', $text, $mode);
-		return $this;
-	}
-
-
-	/**
-	* Append raw XML data
-	*
-	* NOTE: if you append a text node, then its closest ancestor that isn't a text node
-	*       will be returned instead
-	*
-	* @see http://php.net/manual/function.dom-domdocumentfragment-appendxml.php
-	*
-	* @param	string		$xml	XML to append
-	* @return	SimpleDOM			The appended node
 	*/
 	public function insertXML($xml, $mode = 'append')
 	{
-		if (!is_string($xml))
-		{
-			throw new InvalidArgumentException('Argument 1 passed to appendXML() must be a string, ' . gettype($xml) . ' given');
-		}
-
 		$tmp = dom_import_simplexml($this);
 		$fragment = $tmp->ownerDocument->createDocumentFragment();
 
@@ -548,23 +512,14 @@ class SimpleDOM extends SimpleXMLElement
 			throw $exception;
 		}
 
-		$node = $this->insertNode($tmp, $fragment, $mode);
+		$this->insertNode($tmp, $fragment, $mode);
 
 		/**
 		* Restore error reporting
 		*/
 		error_reporting($error_reporting);
 
-		/**
-		* SimpleXML can't handle text nodes, therefore we return the closest parent
-		* that isn't a text node
-		*/
-		while ($node instanceof DOMText)
-		{
-			$node = $node->parentNode;
-		}
-
-		return simplexml_import_dom($node, get_class($this));
+		return $this;
 	}
 
 	/**
@@ -747,6 +702,19 @@ class SimpleDOM extends SimpleXMLElement
 
 	protected function insertNode(DOMNode $tmp, DOMNode $node, $mode)
 	{
+		if ($mode == 'before' || $mode == 'after')
+		{
+			if ($node instanceof DOMText
+			 || $node instanceof DOMElement
+			 || $node instanceof DOMDocumentFragment)
+			{
+				if ($tmp === $tmp->ownerDocument->documentElement)
+				{
+					throw new BadMethodCallException('Cannot insert a ' . get_class($node) . ' node outside of the root node');
+				}
+			}
+		}
+
 		switch ($mode)
 		{
 			case 'before':

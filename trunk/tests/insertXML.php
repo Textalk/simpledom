@@ -33,34 +33,37 @@ class SimpleDOM_TestCase_insertXML extends PHPUnit_Framework_TestCase
 		$root = new SimpleDOM('<root><child /></root>');
 		$new = '<new />';
 
-		$return = $root->insertXML($new);
+		$root->insertXML($new);
 
 		$this->assertXmlStringEqualsXmlString('<root><child /><new /></root>', $root->asXML());
-		$this->assertXmlStringEqualsXmlString($new, $return->asXML());
 	}
 
 	public function testGrandchild()
 	{
 		$root = new SimpleDOM('<root><child /></root>');
-		$new = '<new />';
+		$root->child->insertXML('<new />');
 
-		$return = $root->child->insertXML($new);
-
-		$this->assertXmlStringEqualsXmlString('<root><child><new /></child></root>', $root->asXML());
-		$this->assertXmlStringEqualsXmlString($new, $return->asXML());
+		$this->assertXmlStringEqualsXmlString(
+			'<root><child><new /></child></root>',
+			$root->asXML()
+		);
 	}
 
 	public function testTextNode()
 	{
 		$root = new SimpleDOM('<root><child /></root>');
-
-		$return = $root->insertXML('my text node');
+		$root->insertXML('my text node');
 
 		$this->assertXmlStringEqualsXmlString('<root><child />my text node</root>', $root->asXML());
-		$this->assertSame(
-			dom_import_simplexml($root),
-			dom_import_simplexml($return)
-		);
+	}
+
+	/**
+	* @expectedException BadMethodCallException
+	*/
+	public function testInsertXMLOutsideOfRootNode()
+	{
+		$root = new SimpleDOM('<root><child /></root>');
+		$root->insertXML('my text node', 'after');
 	}
 
 	/**
