@@ -34,7 +34,8 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 			'<root>
 				<child1 />
 				<child2 a="aval" b="bval" />
-			</root>');
+			</root>'
+		);
 
 		$root->child1->copyAttributesFrom($root->child2);
 
@@ -52,12 +53,14 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 		$root = new SimpleDOM(
 			'<root>
 				<child1 />
-			</root>');
+			</root>'
+		);
 
 		$other = new SimpleDOM(
 			'<root>
 				<child2 a="aval" b="bval" />
-			</root>');
+			</root>'
+		);
 
 		$root->child1->copyAttributesFrom($other->child2);
 
@@ -75,7 +78,8 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 			'<root>
 				<child1 />
 				<child2 xmlns:foo="urn:foo" foo:a="foo:aval" a="aval" b="bval" />
-			</root>');
+			</root>'
+		);
 
 		$root->child1->copyAttributesFrom($root->child2);
 
@@ -94,7 +98,8 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 			'<root>
 				<child1 a="old" />
 				<child2 a="aval" b="bval" />
-			</root>');
+			</root>'
+		);
 
 		$root->child1->copyAttributesFrom($root->child2);
 
@@ -113,7 +118,8 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 			'<root>
 				<child1 a="old" />
 				<child2 a="aval" b="bval" />
-			</root>');
+			</root>'
+		);
 
 		$root->child1->copyAttributesFrom($root->child2, false);
 
@@ -132,7 +138,8 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 			'<root>
 				<child1 />
 				<child2 a="aval" b="bval" xmlns:foo="urn:foo" />
-			</root>');
+			</root>'
+		);
 
 		$root->child1->copyAttributesFrom($root->child2);
 
