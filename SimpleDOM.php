@@ -385,7 +385,7 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
-	* Remove all children from a node and add them to current node
+	* Remove all children from a node and clone them to current node
 	*
 	* @param	SimpleXMLElement	$src	Source node
 	* @return	SimpleDOM					Current node
