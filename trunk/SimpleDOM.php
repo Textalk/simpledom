@@ -392,10 +392,7 @@ class SimpleDOM extends SimpleXMLElement
 	*/
 	public function moveTo(SimpleXMLElement $dst)
 	{
-		$dst  = dom_import_simplexml($dst);
-		$node = dom_import_simplexml($this);
-
-		return simplexml_import_dom($dst->appendChild($node->parentNode->removeChild($node)), get_class($this));
+		return $dst->appendChild($this->removeSelf());
 	}
 
 
