@@ -385,63 +385,6 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
-	* Remove all children from a node and clone them to current node
-	*
-	* @param	SimpleXMLElement	$src	Source node
-	* @return	SimpleDOM					Current node
-	*/
-	public function stealChildrenFrom(SimpleXMLElement $src)
-	{
-		$src = dom_import_simplexml($src);
-		$dst = dom_import_simplexml($this);
-		$doc = $dst->ownerDocument;
-
-		if ($doc->isSameNode($src->ownerDocument))
-		{
-			/**
-			* Both source and destination nodes are from the same document. We make sure the source
-			* node is not an ascendant of the destination node
-			*/
-			$node = $dst;
-
-			do
-			{
-				if ($node->isSameNode($src))
-				{
-					throw new BadMethodCallException('Cannot use stealChildrenFrom() on an ascendant of current node');
-				}
-
-				$node = $node->parentNode;
-			}
-			while ($node);
-		}
-
-		$fragment = $doc->createDocumentFragment();
-		while ($child = $src->childNodes->item(0))
-		{
-			$fragment->appendChild($doc->importNode($child->cloneNode(true), true));
-			$child->parentNode->removeChild($child);
-		}
-		$dst->appendChild($fragment);
-
-		return $this;
-	}
-
-	/**
-	* Remove a node from the tree and append it to current node
-	*
-	* @param	SimpleXMLElement	$node	Target node
-	* @return	SimpleDOM					Target node
-	*/
-	public function stealNode(SimpleXMLElement $node)
-	{
-		$dst  = dom_import_simplexml($this);
-		$node = dom_import_simplexml($node);
-
-		return simplexml_import_dom($dst->appendChild($dst->ownerDocument->importNode($node->parentNode->removeChild($node), true)), get_class($this));
-	}
-
-	/**
 	* Move current node to a new parent
 	*
 	* @param	SimpleXMLElement	$dst	Target parent
