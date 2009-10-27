@@ -47,6 +47,28 @@ class SimpleDOM_TestCase_copyAttributesFrom extends PHPUnit_Framework_TestCase
 		);
 	}
 
+	public function testAttributesAreCopiedAcrossDocuments()
+	{
+		$root = new SimpleDOM(
+			'<root>
+				<child1 />
+			</root>');
+
+		$other = new SimpleDOM(
+			'<root>
+				<child2 a="aval" b="bval" />
+			</root>');
+
+		$root->child1->copyAttributesFrom($other->child2);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<root>
+				<child1 a="aval" b="bval" />
+			</root>',
+			$root->asXML()
+		);
+	}
+
 	public function testNSAttributesAreCopied()
 	{
 		$root = new SimpleDOM(
