@@ -28,12 +28,42 @@ require_once dirname(__FILE__) . '/../SimpleDOM.php';
  
 class SimpleDOM_TestCase_insertPI extends PHPUnit_Framework_TestCase
 {
+	public function testDefaultModeIsBefore()
+	{
+		$root = new SimpleDOM('<root />');
+		$expected_xml = '<?test ?><root />';
+
+		$return = $root->insertPI('test');
+
+		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
+	}
+
+	public function testAppend()
+	{
+		$root = new SimpleDOM('<root />');
+		$expected_xml = '<root><?test ?></root>';
+
+		$return = $root->insertPI('test', null, 'append');
+
+		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
+	}
+
+	public function testAfter()
+	{
+		$root = new SimpleDOM('<root />');
+		$expected_xml = '<root /><?test ?>';
+
+		$return = $root->insertPI('test', null, 'after');
+
+		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
+	}
+
 	public function testNoData()
 	{
 		$root = new SimpleDOM('<root />');
 		$expected_xml = '<?xml-stylesheet?><root />';
 
-		$return = $root->insertPI('xml-stylesheet');
+		$return = $root->insertPI('xml-stylesheet', null, 'before');
 
 		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
 	}
@@ -43,7 +73,7 @@ class SimpleDOM_TestCase_insertPI extends PHPUnit_Framework_TestCase
 		$root = new SimpleDOM('<root />');
 		$expected_xml = '<?xml-stylesheet type="text/xsl" href="foo.xsl"?><root />';
 
-		$return = $root->insertPI('xml-stylesheet', 'type="text/xsl" href="foo.xsl"');
+		$return = $root->insertPI('xml-stylesheet', 'type="text/xsl" href="foo.xsl"', 'before');
 
 		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
 	}
@@ -56,7 +86,7 @@ class SimpleDOM_TestCase_insertPI extends PHPUnit_Framework_TestCase
 		$return = $root->insertPI('xml-stylesheet', array(
 			'type' => 'text/xsl',
 			'href' => 'foo.xsl'
-		));
+		), 'before');
 
 		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
 	}
@@ -66,8 +96,8 @@ class SimpleDOM_TestCase_insertPI extends PHPUnit_Framework_TestCase
 		$root = new SimpleDOM('<root />');
 		$expected_xml = '<?xml-stylesheet type="text/xsl" href="foo.xsl"?><?xml-stylesheet type="text/xsl" href="bar.xsl"?><root />';
 
-		$root->insertPI('xml-stylesheet', 'type="text/xsl" href="foo.xsl"');
-		$root->insertPI('xml-stylesheet', 'type="text/xsl" href="bar.xsl"');
+		$root->insertPI('xml-stylesheet', 'type="text/xsl" href="foo.xsl"', 'before');
+		$root->insertPI('xml-stylesheet', 'type="text/xsl" href="bar.xsl"', 'before');
 
 		$this->assertXmlStringEqualsXmlString($root->asXML(), $expected_xml);
 	}
