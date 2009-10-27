@@ -193,7 +193,7 @@ class SimpleDOM extends SimpleXMLElement
 	{
 		$tmp = dom_import_simplexml($this);
 
-		if ($tmp === $tmp->ownerDocument->documentElement)
+		if ($tmp->isSameNode($tmp->ownerDocument->documentElement))
 		{
 			throw new BadMethodCallException('deleteSelf() cannot be used to delete the root node');
 		}
@@ -215,7 +215,7 @@ class SimpleDOM extends SimpleXMLElement
 	{
 		$tmp = dom_import_simplexml($this);
 
-		if ($tmp === $tmp->ownerDocument->documentElement)
+		if ($tmp->isSameNode($tmp->ownerDocument->documentElement))
 		{
 			throw new BadMethodCallException('removeSelf() cannot be used to remove the root node');
 		}
@@ -263,7 +263,7 @@ class SimpleDOM extends SimpleXMLElement
 		{
 			$tmp = dom_import_simplexml($nodes[0]);
 
-			if ($tmp === $tmp->ownerDocument->documentElement)
+			if ($tmp->isSameNode($tmp->ownerDocument->documentElement))
 			{
 				unset($nodes[0]);
 			}
@@ -296,7 +296,7 @@ class SimpleDOM extends SimpleXMLElement
 		{
 			$tmp = dom_import_simplexml($nodes[0]);
 
-			if ($tmp === $tmp->ownerDocument->documentElement)
+			if ($tmp->isSameNode($tmp->ownerDocument->documentElement))
 			{
 				unset($nodes[0]);
 			}
@@ -716,7 +716,7 @@ class SimpleDOM extends SimpleXMLElement
 			 || $node instanceof DOMElement
 			 || $node instanceof DOMDocumentFragment)
 			{
-				if ($tmp === $tmp->ownerDocument->documentElement)
+				if ($tmp->isSameNode($tmp->ownerDocument->documentElement))
 				{
 					throw new BadMethodCallException('Cannot insert a ' . get_class($node) . ' node outside of the root node');
 				}
