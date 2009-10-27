@@ -41,6 +41,19 @@ class SimpleDOM_TestCase_cloneChildrenFrom extends PHPUnit_Framework_TestCase
 		);
 	}
 
+	public function testMultipleDocumentsNS()
+	{
+		$doc1 = new SimpleDOM('<doc1 />');
+		$doc2 = new SimpleDOM('<doc2 xmlns:ns="urn:ns"><ns:child1 /><child2 /><child3 /></doc2>');
+
+		$doc1->cloneChildrenFrom($doc2);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc1><ns:child1  xmlns:ns="urn:ns"/><child2 /><child3 /></doc1>',
+			$doc1->asXML()
+		);
+	}
+
 	public function testNodesAreNotBoundToSourceDocument()
 	{
 		$doc1 = new SimpleDOM('<doc1 />');

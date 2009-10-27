@@ -396,11 +396,33 @@ class SimpleDOM extends SimpleXMLElement
 		$dst = dom_import_simplexml($this);
 		$doc = $dst->ownerDocument;
 
-		while ($src->childNodes->length)
+		if ($doc->isSameNode($src->ownerDocument))
 		{
-			$child = $src->childNodes->item(0);
-			$dst->appendChild($doc->importNode($child->parentNode->removeChild($child), true));
+			/**
+			* Both source and destination nodes are from the same document. We make sure the source
+			* node is not an ascendant of the destination node
+			*/
+			$node = $dst;
+
+			do
+			{
+				if ($node->isSameNode($src))
+				{
+					throw new BadMethodCallException('Cannot use stealChildrenFrom() on an ascendant of current node');
+				}
+
+				$node = $node->parentNode;
+			}
+			while ($node);
 		}
+
+		$fragment = $doc->createDocumentFragment();
+		while ($child = $src->childNodes->item(0))
+		{
+			$fragment->appendChild($doc->importNode($child->cloneNode(true), true));
+			$child->parentNode->removeChild($child);
+		}
+		$dst->appendChild($fragment);
 
 		return $this;
 	}
