@@ -48,4 +48,53 @@ class SimpleDOM_TestCase_moveTo extends PHPUnit_Framework_TestCase
 
 		$this->assertXmlStringEqualsXmlString($expected, $root->asXML());
 	}
+
+	public function testMultipleDocuments()
+	{
+		$doc1 = new SimpleDOM('<doc1><child1 /><child2 /></doc1>');
+		$doc2 = new SimpleDOM('<doc2><child3 /></doc2>');
+
+		$doc2->child3->moveTo($doc1);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc1><child1 /><child2 /><child3 /></doc1>',
+			$doc1->asXML()
+		);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc2 />',
+			$doc2->asXML()
+		);
+	}
+
+	public function testNS()
+	{
+		$root		= new SimpleDOM(
+			'<root>
+				<ns:child1 xmlns:ns="urn:ns">
+					<ns:grandchild1 />
+				</ns:child1>
+				<child2 />
+				<child3 />
+			</root>',
+
+			LIBXML_NOBLANKS
+		);
+		$expected	= 
+			'<root>
+				<ns:child1 xmlns:ns="urn:ns" />
+				<child2>
+					<ns:grandchild1 xmlns:ns="urn:ns" moved="1" />
+				</child2>
+				<child3 />
+			</root>';
+
+		$nodes	= $root->children('urn:ns');
+		$node	= $nodes[0]->grandchild1;
+
+		$return = $node->moveTo($root->child2);
+		$return['moved'] = 1;
+
+		$this->assertXmlStringEqualsXmlString($expected, $root->asXML());
+	}
 }
