@@ -348,7 +348,8 @@ class SimpleDOM extends SimpleXMLElement
 
 		foreach (dom_import_simplexml($src)->attributes as $attr)
 		{
-			if ($overwrite || !$dom->hasAttributeNS($attr->namespaceURI, $attr->nodeName))
+			if ($overwrite
+			 || !$dom->hasAttributeNS($attr->namespaceURI, $attr->nodeName))
 			{
 				$dom->setAttributeNS($attr->namespaceURI, $attr->nodeName, $attr->nodeValue);
 			}
@@ -360,18 +361,25 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Clone all children from a node and add them to current node
 	*
+	* This method takes a snapshot of the children nodes then append them in order to avoid infinite
+	* recursion if the destination node is a descendant of or the source node itself
+	*
 	* @param	SimpleXMLElement	$src	Source node
+	* @param	bool				$deep	If TRUE, clone descendant nodes as well
 	* @return	SimpleDOM					Current node
 	*/
-	public function cloneChildrenFrom(SimpleXMLElement $src)
+	public function cloneChildrenFrom(SimpleXMLElement $src, $deep = true)
 	{
 		$src = dom_import_simplexml($src);
 		$dst = dom_import_simplexml($this);
+		$doc = $dst->ownerDocument;
 
+		$fragment = $doc->createDocumentFragment();
 		foreach ($src->childNodes as $child)
 		{
-			$dst->appendChild($dst->ownerDocument->importNode($child->cloneNode(true), true));
+			$fragment->appendChild($doc->importNode($child->cloneNode($deep), $deep));
 		}
+		$dst->appendChild($fragment);
 
 		return $this;
 	}

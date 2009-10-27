@@ -61,4 +61,128 @@ class SimpleDOM_TestCase_cloneChildrenFrom extends PHPUnit_Framework_TestCase
 			$doc2->asXML()
 		);
 	}
+
+	public function testCloningIsDeepByDefault()
+	{
+		$doc1 = new SimpleDOM('<doc1 />');
+		$doc2 = new SimpleDOM(
+			'<doc2>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</doc2>'
+		);
+
+		$doc1->cloneChildrenFrom($doc2);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc1>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</doc1>',
+			$doc1->asXML()
+		);
+	}
+
+	public function testCloningCanBeShallow()
+	{
+		$doc1 = new SimpleDOM('<doc1 />');
+		$doc2 = new SimpleDOM(
+			'<doc2>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</doc2>'
+		);
+
+		$doc1->cloneChildrenFrom($doc2, false);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<doc1>
+				<child1 />
+				<child2 />
+				<child3 />
+			</doc1>',
+			$doc1->asXML()
+		);
+	}
+
+	public function testCloningFromSameNode()
+	{
+		$node = new SimpleDOM(
+			'<node>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</node>'
+		);
+
+		$node->cloneChildrenFrom($node, true);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<node>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</node>',
+			$node->asXML()
+		);
+	}
+
+	public function testCloningFromDescendantNode()
+	{
+		$node = new SimpleDOM(
+			'<node>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</node>'
+		);
+
+		$node->cloneChildrenFrom($node->child1, true);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<node>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+
+				<granchild1 />
+			</node>',
+			$node->asXML()
+		);
+	}
+
+	public function testCloningFromAscendantNode()
+	{
+		$node = new SimpleDOM(
+			'<node>
+				<child1><granchild1 /></child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</node>'
+		);
+
+		$node->child1->cloneChildrenFrom($node, true);
+
+		$this->assertXmlStringEqualsXmlString(
+			'<node>
+				<child1>
+					<granchild1 />
+
+					<child1><granchild1 /></child1>
+					<child2 />
+					<child3><granchild3 /></child3>
+				</child1>
+				<child2 />
+				<child3><granchild3 /></child3>
+			</node>',
+			$node->asXML()
+		);
+	}
 }
