@@ -101,4 +101,52 @@ class SimpleDOM_TestCase_asPrettyXML extends PHPUnit_Framework_TestCase
 
 		$this->assertSame($expected, $root->asPrettyXML());
 	}
+
+	public function testFileIsCreatedOnSuccess()
+	{
+		$root = new SimpleDOM('<root><child /></root>');
+
+		$filepath = $this->tempfile();
+		$success  = $root->asPrettyXML($filepath);
+
+		$this->assertTrue($success);
+		$this->assertFileExists($filepath);
+	}
+
+	public function testFileContentMatchesXML()
+	{
+		$root = new SimpleDOM('<root><child /></root>');
+
+		$filepath = $this->tempfile();
+		$success  = $root->asPrettyXML($filepath);
+
+		$this->assertXmlStringEqualsXmlFile($filepath, $root->asXML());
+	}
+
+	/**
+	* Internal stuff
+	*/
+	protected $tempfiles = array();
+	protected function tempfile()
+	{
+		$filepath = tempnam(sys_get_temp_dir(), 'SimpleDOM_test_');
+		if (file_exists($filepath))
+		{
+			unlink($filepath);
+		}
+
+		$this->tempfiles[] = $filepath;
+		return $filepath;
+	}
+
+	public function __destruct()
+	{
+		foreach ($this->tempfiles as $filepath)
+		{
+			if (file_exists($filepath))
+			{
+				unlink($filepath);
+			}
+		}
+	}
 }

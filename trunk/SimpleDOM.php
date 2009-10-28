@@ -723,6 +723,8 @@ class SimpleDOM extends SimpleXMLElement
 			case 'append':
 			default:
 				return $tmp->appendChild($node);
+				// @codeCoverageIgnoreStart
 		}
+		// @codeCoverageIgnoreEnd
 	}
 }
