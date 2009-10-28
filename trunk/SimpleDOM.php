@@ -554,17 +554,16 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Set several attributes at once
 	*
-	* @todo namespaces?
-	* @todo will fail if an attribute already exists?
-	*
-	* @param	array		$attr
+	* @param	array		$attr	Attributes as name => value pairs
+	* @param	string		$ns		Namespace for the attributes
 	* @return	SimpleDOM			Current node
 	*/
-	public function setAttributes(array $attr)
+	public function setAttributes(array $attr, $ns = null)
 	{
+		$dom = dom_import_simplexml($this);
 		foreach ($attr as $k => $v)
 		{
-			$this->setAttribute($k, $v);
+			$dom->setAttributeNS($ns, $k, $v);
 		}
 		return $this;
 	}
@@ -642,6 +641,7 @@ class SimpleDOM extends SimpleXMLElement
 		if ($use_xslcache && extension_loaded('xslcache'))
 		{
 			$xslt = new XSLTCache($filepath);
+			readfile($filepath);
 		}
 		else
 		{
