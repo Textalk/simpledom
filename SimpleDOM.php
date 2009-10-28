@@ -387,6 +387,8 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Move current node to a new parent
 	*
+	* @note ATTENTION! using references to the old node will screw up the original document
+	*
 	* @param	SimpleXMLElement	$dst	Target parent
 	* @return	SimpleDOM					Current node
 	*/
@@ -542,6 +544,9 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Set several attributes at once
 	*
+	* @todo namespaces?
+	* @todo will fail if an attribute already exists?
+	*
 	* @param	array		$attr
 	* @return	SimpleDOM			Current node
 	*/
@@ -570,9 +575,15 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
-	* 
+	* Return the current node slightly prettified
 	*
-	* @return	void
+	* Elements will be indented, empty elements will be minified. The result isn't mean to be
+	* perfect, I'm sure there are better prettifier out there.
+	*
+	* @param	string	$filepath	If set, save the result to this file
+	* @return	mixed				If $filepath is set, will return TRUE if the file was
+	*								succesfully written or FALSE otherwise. If $filepath isn't set,
+	*								it returns the result as a string
 	*/
 	public function asPrettyXML($filepath = null)
 	{
@@ -597,14 +608,14 @@ class SimpleDOM extends SimpleXMLElement
 		$xslt = new XSLTProcessor;
 		$xslt->importStylesheet($xsl);
 
+		$result = trim($xslt->transformToXML($xml));
+
 		if (isset($filepath))
 		{
-			return $xslt->transformToURI($xml, $filepath);
+			return (bool) file_put_contents($filepath, $result);
 		}
-		else
-		{
-			return $xslt->transformToXML($xml);
-		}
+
+		return $result;
 	}
 
 	/**
