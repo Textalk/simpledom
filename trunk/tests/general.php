@@ -26,7 +26,7 @@ THE SOFTWARE.
 require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__) . '/../SimpleDOM.php';
  
-class SimpleDOM_TestCase_SimpleDOM extends PHPUnit_Framework_TestCase
+class SimpleDOM_TestCase_general extends PHPUnit_Framework_TestCase
 {
 	/**
 	* @expectedException BadMethodCallException
@@ -80,5 +80,11 @@ class SimpleDOM_TestCase_SimpleDOM extends PHPUnit_Framework_TestCase
 			$this->assertSame('Undefined method SimpleDOM::UNKNOWN_METHOD()', $e->getMessage());
 			throw $e;
 		}
+	}
+
+	public function testTextNodesAreReturnedAsText()
+	{
+		$xml = new SimpleDOM('<xml>This <is /> a text</xml>');
+		$this->assertSame(' a text', $xml->lastChild());
 	}
 }
