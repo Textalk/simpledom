@@ -641,7 +641,6 @@ class SimpleDOM extends SimpleXMLElement
 		if ($use_xslcache && extension_loaded('xslcache'))
 		{
 			$xslt = new XSLTCache($filepath);
-			readfile($filepath);
 		}
 		else
 		{
