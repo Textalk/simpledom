@@ -147,7 +147,7 @@ class SimpleDOM_TestCase_deleteNodes extends PHPUnit_Framework_TestCase
 	public function testRoodNodeIsNeverDeleted()
 	{
 		$node = new SimpleDOM('<node><node /></node>');
-		$node->deleteNodes('node');
+		$node->deleteNodes('//node');
 
 		$this->assertXmlStringEqualsXmlString('<node />', $node->asXML());
 	}
