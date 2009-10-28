@@ -125,6 +125,15 @@ class SimpleDOM extends SimpleXMLElement
 
 		if ($ret instanceof DOMNode)
 		{
+			if ($ret instanceof DOMAttr)
+			{
+				/**
+				* Methods that affect attributes can't return the attributes themselves. Instead,
+				* we make them chainable
+				*/
+				return $this;
+			}
+
 			return simplexml_import_dom($ret, get_class($this));
 		}
 

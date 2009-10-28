@@ -26,60 +26,32 @@ THE SOFTWARE.
 require_once 'PHPUnit/Framework.php';
 require_once dirname(__FILE__) . '/../SimpleDOM.php';
  
-class SimpleDOM_TestCase_setAttributes extends PHPUnit_Framework_TestCase
+class SimpleDOM_TestCase_setAttributeNS extends PHPUnit_Framework_TestCase
 {
-	public function test()
-	{
-		$node = new SimpleDOM('<node />');
-
-		$node->setAttributes(array(
-			'a' => 'aval',
-			'b' => 'bval'
-		));
-
-		$this->assertXmlStringEqualsXmlString(
-			'<node a="aval" b="bval" />',
-			$node->asXML()
-		);
-	}
-
 	public function testNS()
 	{
 		$node = new SimpleDOM('<node xmlns:ns="urn:ns" />');
 
-		$node->setAttributes(array(
-			'a' => 'aval',
-			'b' => 'bval'
-		), 'urn:ns');
+		$node->setAttributeNS('urn:ns', 'a', 'aval');
 
 		$this->assertXmlStringEqualsXmlString(
-			'<node xmlns:ns="urn:ns" ns:a="aval" ns:b="bval" />',
+			'<node xmlns:ns="urn:ns" ns:a="aval" />',
 			$node->asXML()
 		);
 	}
 
-	public function testExistentAttributesAreOverwritten()
-	{
-		$node = new SimpleDOM('<node a="old" />');
-
-		$node->setAttributes(array(
-			'a' => 'aval',
-			'b' => 'bval'
-		));
-
-		$this->assertXmlStringEqualsXmlString(
-			'<node a="aval" b="bval" />',
-			$node->asXML()
-		);
-	}
-
+	/**
+	* For some reason, DOMElement::setAttributeNS doesn't return anything
+	*/
+	/*
 	public function testIsChainable()
 	{
-		$node = new SimpleDOM('<node />');
+		$node = new SimpleDOM('<node xmlns:ns="urn:ns" />');
 
-		$return = $node->setAttributes(array());
+		$return = $node->setAttributeNS('urn:ns', 'a', 'aval');
 
 		$this->assertEquals($node, $return);
 		$this->assertTrue(dom_import_simplexml($node)->isSameNode(dom_import_simplexml($return)));
 	}
+	*/
 }
