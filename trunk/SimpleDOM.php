@@ -73,12 +73,22 @@ class SimpleDOM extends SimpleXMLElement
 			'textContent'		=> 'property'
 		);
 
+		$dom = dom_import_simplexml($this);
+
 		if (!isset($passthrough[$name]))
 		{
-			throw new BadMethodCallException('Call to undefined method ' . get_class($this) . '::' . $name . '()');
-		}
+			if (method_exists($dom, $name))
+			{
+				throw new BadMethodCallException('DOM method ' . $name . '() is not supported');
+			}
 
-		$tmp = dom_import_simplexml($this);
+			if (property_exists($dom, $name))
+			{
+				throw new BadMethodCallException('DOM property ' . $name . ' is not supported');
+			}
+
+			throw new BadMethodCallException('Undefined method ' . get_class($this) . '::' . $name . '()');
+		}
 
 		switch ($passthrough[$name])
 		{
@@ -86,7 +96,7 @@ class SimpleDOM extends SimpleXMLElement
 				if (isset($args[0])
 				 && $args[0] instanceof SimpleXMLElement)
 				{
-					$args[0] = $tmp->ownerDocument->importNode(dom_import_simplexml($args[0]), true);
+					$args[0] = $dom->ownerDocument->importNode(dom_import_simplexml($args[0]), true);
 				}
 				// no break; here
 
@@ -100,11 +110,11 @@ class SimpleDOM extends SimpleXMLElement
 				}
 				unset($arg);
 
-				$ret = call_user_func_array(array($tmp, $name), $args);
+				$ret = call_user_func_array(array($dom, $name), $args);
 				break;
 
 			case 'property':
-				$ret = $tmp->$name;
+				$ret = $dom->$name;
 				break;
 		}
 
@@ -623,12 +633,13 @@ class SimpleDOM extends SimpleXMLElement
 	*
 	* Will take advantage of PECL's xslcache if available
 	*
-	* @param	string	$filepath	Path to stylesheet
-	* @return	string				Result
+	* @param	string	$filepath		Path to stylesheet
+	* @param	bool	$use_xslcache	If TRUE, use the XSL Cache extension if available
+	* @return	string					Result
 	*/
-	public function XSLT($filepath)
+	public function XSLT($filepath, $use_xslcache = true)
 	{
-		if (extension_loaded('xslcache'))
+		if ($use_xslcache && extension_loaded('xslcache'))
 		{
 			$xslt = new XSLTCache($filepath);
 		}
