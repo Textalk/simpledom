@@ -649,7 +649,8 @@ class SimpleDOM extends SimpleXMLElement
 	{
 		if ($use_xslcache && extension_loaded('xslcache'))
 		{
-			$xslt = new XSLTCache($filepath);
+			$xslt = new XSLTCache;
+			$xslt->importStylesheet($filepath);
 		}
 		else
 		{
