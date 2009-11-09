@@ -480,8 +480,7 @@ class SimpleDOM extends SimpleXMLElement
 		/**
 		* Disable error reporting
 		*/
-		$error_reporting = error_reporting();
-		error_reporting(0);
+		$use_errors = libxml_use_internal_errors(true);
 
 		if (!$fragment->appendXML($xml))
 		{
@@ -499,16 +498,12 @@ class SimpleDOM extends SimpleXMLElement
 				$exception = new InvalidArgumentException($e->getMessage());
 			}
 
-			error_reporting($error_reporting);
+			libxml_use_internal_errors($use_errors);
 			throw $exception;
 		}
+		libxml_use_internal_errors($use_errors);
 
 		$this->insertNode($tmp, $fragment, $mode);
-
-		/**
-		* Restore error reporting
-		*/
-		error_reporting($error_reporting);
 
 		return $this;
 	}
@@ -671,18 +666,11 @@ class SimpleDOM extends SimpleXMLElement
 
 	protected function _xpath($xpath)
 	{
-		if (!libxml_use_internal_errors())
-		{
-			$restore = true;
-			libxml_use_internal_errors(true);
-		}
+		$use_errors = libxml_use_internal_errors(true);
 
 		$nodes = $this->xpath($xpath);
 
-		if (isset($restore))
-		{
-			libxml_use_internal_errors(false);
-		}
+		libxml_use_internal_errors($use_errors);
 
 		if ($nodes === false)
 		{
