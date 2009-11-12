@@ -750,6 +750,74 @@ class SimpleDOM extends SimpleXMLElement
 		return $xslt->transformToXML(dom_import_simplexml($this));
 	}
 
+	/**
+	* Run an XPath query and sort the result
+	*
+	* This method accepts any number of arguments in a way similar to {@link
+	* http://docs.php.net/manual/en/function.array-multisort.php array_multisort()}
+	*
+	* <code>
+	* // Retrieve all <x/> nodes, sorted by @foo ascending, @bar descending
+	* $root->sortedXPath('//x', '@foo', '@bar', SORT_DESC);
+	*
+	* // Same, but sort @foo numerically and @bar as strings
+	* $root->sortedXPath('//x', '@foo', SORT_NUMERIC, '@bar', SORT_STRING, SORT_DESC);
+	* </code>
+	*
+	* @param	string	$xpath		XPath expression
+	* @return	void
+	*/
+	public function sortedXPath($xpath)
+	{
+		$ret  = $this->xpath($xpath);
+		$args = func_get_args();
+		unset($args[0]);
+
+		$sort = array();
+		$tmp  = array();
+
+		foreach ($args as $k => $arg)
+		{
+			if (is_string($arg))
+			{
+				$tmp[$k] = array();
+
+				if (preg_match('#^current\\(\\)|text\\(\\)|\\.$#i', $arg))
+				{
+					/**
+					* If the XPath is current() or text() or . we use this node's textContent
+					*/
+					foreach ($ret as $node)
+					{
+						$tmp[$k][] = dom_import_simplexml($node)->textContent;
+					}
+				}
+				else
+				{
+					foreach ($ret as $node)
+					{
+						$nodes = $node->xpath($arg);
+						$tmp[$k][] = (empty($nodes)) ? '' : (string) $nodes[0];
+					}
+				}
+			}
+			else
+			{
+				$tmp[$k] = $arg;
+			}
+
+			/**
+			* array_multisort() wants everything to be passed as reference so we have to cheat
+			*/
+			$sort[] =& $tmp[$k];
+		}
+
+		$sort[] =& $ret;
+
+		call_user_func_array('array_multisort', $sort);
+		return $ret;
+	}
+
 
 	//=================================
 	// Internal stuff
