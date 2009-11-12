@@ -1,7 +1,7 @@
 <?php
 /*
 
-Copyright 2007 The SimpleDOM Working Group Initiative
+Copyright 2009 The SimpleDOM authors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -90,6 +90,7 @@ class SimpleDOM extends SimpleXMLElement
 	// DOM stuff
 	//=================================
 
+	/** @ignore **/
 	public function __call($name, $args)
 	{
 		$passthrough = array(
@@ -695,7 +696,8 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Transform current node and return the result
 	*
-	* Will take advantage of PECL's xslcache if available
+	* Will take advantage of {@link http://pecl.php.net/package/xslcache PECL's xslcache}
+	* if available
 	*
 	* @param	string	$filepath		Path to stylesheet
 	* @param	bool	$use_xslcache	If TRUE, use the XSL Cache extension if available
