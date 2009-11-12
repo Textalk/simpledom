@@ -691,7 +691,8 @@ class SimpleDOM extends SimpleXMLElement
 
 	protected function insertNode(DOMNode $tmp, DOMNode $node, $mode)
 	{
-		if ($mode == 'before' || $mode == 'after')
+		if ($mode === 'before'
+		 || $mode === 'after')
 		{
 			if ($node instanceof DOMText
 			 || $node instanceof DOMElement
@@ -702,26 +703,20 @@ class SimpleDOM extends SimpleXMLElement
 					throw new BadMethodCallException('Cannot insert a ' . get_class($node) . ' node outside of the root node');
 				}
 			}
-		}
 
-		switch ($mode)
-		{
-			case 'before':
+			if ($mode === 'before')
+			{
 				return $tmp->parentNode->insertBefore($node, $tmp);
+			}
 
-			case 'after':
-				if ($tmp->nextSibling)
-				{
-					return $tmp->parentNode->insertBefore($node, $tmp->nextSibling);
-				}
+			if ($tmp->nextSibling)
+			{
+				return $tmp->parentNode->insertBefore($node, $tmp->nextSibling);
+			}
 
-				return $tmp->parentNode->appendChild($node);
-
-			case 'append':
-			default:
-				return $tmp->appendChild($node);
-				// @codeCoverageIgnoreStart
+			return $tmp->parentNode->appendChild($node);
 		}
-		// @codeCoverageIgnoreEnd
+
+		return $tmp->appendChild($node);
 	}
 }
