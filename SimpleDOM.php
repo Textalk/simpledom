@@ -1,5 +1,5 @@
 <?php
-/*
+/**
 
 Copyright 2009 The SimpleDOM authors
 
@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
+* @package SimpleDOM
 */
 
 /**
@@ -57,6 +58,9 @@ function simpledom_load_string($string)
 	return call_user_func_array('simplexml_load_string', $args);
 }
 
+/**
+* @package SimpleDOM
+*/
 class SimpleDOM extends SimpleXMLElement
 {
 	//=================================
@@ -469,7 +473,7 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Move current node to a new parent
 	*
-	* @note ATTENTION! using references to the old node will screw up the original document
+	* ATTENTION! using references to the old node will screw up the original document
 	*
 	* @param	SimpleXMLElement	$dst	Target parent
 	* @return	SimpleDOM					Current node
@@ -787,7 +791,7 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
-	* @note in order to support LSB, __CLASS__ would need to be replaced by get_called_class() and
+	* NOTE: in order to support LSB, __CLASS__ would need to be replaced by get_called_class() and
 	*		this method would need to be invoked via static:: instead of self::
 	*/
 	static protected function fromHTML($method, $arg)
