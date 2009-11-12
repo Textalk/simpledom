@@ -22,6 +22,41 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 */
+
+/**
+* Alias for simplexml_load_file()
+*
+* @return	SimpleDOM
+*/
+function simpledom_load_file($filename)
+{
+	$args = func_get_args();
+
+	if (isset($args[0]) && !isset($args[1]))
+	{
+		$args[1] = 'SimpleDOM';
+	}
+
+	return call_user_func_array('simplexml_load_file', $args);
+}
+
+/**
+* Alias for simplexml_load_string()
+*
+* @return	SimpleDOM
+*/
+function simpledom_load_string($string)
+{
+	$args = func_get_args();
+
+	if (isset($args[0]) && !isset($args[1]))
+	{
+		$args[1] = 'SimpleDOM';
+	}
+
+	return call_user_func_array('simplexml_load_string', $args);
+}
+
 class SimpleDOM extends SimpleXMLElement
 {
 	//=================================
