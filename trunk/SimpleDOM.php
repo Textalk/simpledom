@@ -60,6 +60,33 @@ function simpledom_load_string($string)
 class SimpleDOM extends SimpleXMLElement
 {
 	//=================================
+	// Factories
+	//=================================
+
+	/**
+	* Create a SimpleDOM object from a HTML string
+	*
+	* @param	string		$source		HTML source
+	* @return	SimpleDOM
+	*/
+	static public function loadHTML($source)
+	{
+		return self::fromHTML('loadHTML', $source);
+	}
+
+	/**
+	* Create a SimpleDOM object from a HTML file
+	*
+	* @param	string		$filename	HTML file
+	* @return	SimpleDOM
+	*/
+	static public function loadHTMLFile($filename)
+	{
+		return self::fromHTML('loadHTMLFile', $filename);
+	}
+
+
+	//=================================
 	// DOM stuff
 	//=================================
 
@@ -753,5 +780,17 @@ class SimpleDOM extends SimpleXMLElement
 		}
 
 		return $tmp->appendChild($node);
+	}
+
+	/**
+	* @note in order to support LSB, __CLASS__ would need to be replaced by get_called_class() and
+	*		this method would need to be invoked via static:: instead of self::
+	*/
+	static protected function fromHTML($method, $arg)
+	{
+		$dom = new DOMDocument;
+		$dom->$method($arg);
+
+		return simplexml_import_dom($dom, __CLASS__);
 	}
 }
