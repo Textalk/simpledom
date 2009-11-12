@@ -490,8 +490,8 @@ class SimpleDOM extends SimpleXMLElement
 			*/
 			try
 			{
-				new SimpleXMLElement($xml);
 				$exception = new UnexpectedValueException('DOM could not append XML (reason unknown)');
+				new SimpleXMLElement($xml);
 			}
 			catch (Exception $e)
 			{
