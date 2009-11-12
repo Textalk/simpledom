@@ -226,9 +226,9 @@ class SimpleDOM extends SimpleXMLElement
 	* Add a new sibling before this node
 	*
 	* This is a convenience method. The same result can be achieved with
-	* {{{
+	* <code>
 	* $node->parentNode()->insertBefore($new, $node);
-	* }}}
+	* </code>
 	*
 	* @param	SimpleXMLElement	$new	New node
 	* @return	SimpleDOM					The inserted node
@@ -245,9 +245,9 @@ class SimpleDOM extends SimpleXMLElement
 	* Add a new sibling after this node
 	*
 	* This is a convenience method. The same result can be achieved with
-	* {{{
+	* <code>
 	* $node->parentNode()->insertBefore($new, $node->nextSibling());
-	* }}}
+	* </code>
 	*
 	* @param	SimpleXMLElement	$new	New node
 	* @return	SimpleDOM					The inserted node
@@ -264,9 +264,9 @@ class SimpleDOM extends SimpleXMLElement
 	* Delete this node from document
 	*
 	* This is a convenience method. The same result can be achieved with
-	* {{{
+	* <code>
 	* $node->parentNode()->removeChild($node);
-	* }}}
+	* </code>
 	*
 	* @return	void
 	*/
@@ -286,9 +286,9 @@ class SimpleDOM extends SimpleXMLElement
 	* Remove this node from document
 	*
 	* This is a convenience method. The same result can be achieved with
-	* {{{
+	* <code>
 	* $node->parentNode()->removeChild($node);
-	* }}}
+	* </code>
 	*
 	* @return	SimpleDOM		The removed node
 	*/
@@ -309,9 +309,9 @@ class SimpleDOM extends SimpleXMLElement
 	* Replace this node
 	*
 	* This is a convenience method. The same result can be achieved with
-	* {{{
+	* <code>
 	* $node->parentNode()->replaceChild($new, $node);
-	* }}}
+	* </code>
 	*
 	* @param	SimpleXMLElement	$new	New node
 	* @return	SimpleDOM					Replaced node on success
@@ -571,9 +571,8 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
-	* Add a Processing Instruction at the top of the document
+	* Insert a Processing Instruction
 	*
-	* Processing Instructions are inserted in order, right before the root node.
 	* The content of the PI can be passed either as string or as an associative array.
 	*
 	* @param	string			$target		Target of the processing instruction
@@ -726,6 +725,9 @@ class SimpleDOM extends SimpleXMLElement
 	// Internal stuff
 	//=================================
 
+	/**#@+
+	* @ignore
+	*/
 	protected function _xpath($xpath)
 	{
 		$use_errors = libxml_use_internal_errors(true);
@@ -793,4 +795,5 @@ class SimpleDOM extends SimpleXMLElement
 
 		return simplexml_import_dom($dom, __CLASS__);
 	}
+	/**#@-*/
 }
