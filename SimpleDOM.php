@@ -769,7 +769,27 @@ class SimpleDOM extends SimpleXMLElement
 	*/
 	public function sortedXPath($xpath)
 	{
-		$ret  = $this->xpath($xpath);
+		$nodes   =  $this->xpath($xpath);
+		$args    =  func_get_args();
+		$args[0] =& $nodes;
+
+		call_user_func_array(array(get_class($this), 'sort'), $args);
+
+		return $nodes;
+	}
+
+	/**
+	* Sort an array of nodes
+	*
+	* Note that nodes are sorted in place, nothing is returned
+	*
+	* @see sortedXPath
+	*
+	* @param	array	$ret		Array of SimpleXMLElement
+	* @return	void
+	*/
+	static public function sort(array &$ret)
+	{
 		$args = func_get_args();
 		unset($args[0]);
 
@@ -815,7 +835,6 @@ class SimpleDOM extends SimpleXMLElement
 		$sort[] =& $ret;
 
 		call_user_func_array('array_multisort', $sort);
-		return $ret;
 	}
 
 
