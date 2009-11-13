@@ -779,6 +779,32 @@ class SimpleDOM extends SimpleXMLElement
 	}
 
 	/**
+	* Sort this node's children
+	*
+	* ATTENTION: text nodes are not supported. If current node has text nodes, they may be lost in
+	* the process
+	*
+	* @return	SimpleDOM		This node
+	*/
+	public function sortChildren()
+	{
+		$nodes   =  $this->removeNodes('*');
+		$args    =  func_get_args();
+
+		array_unshift($args, null);
+		$args[0] =& $nodes;
+
+		call_user_func_array(array(get_class($this), 'sort'), $args);
+
+		foreach ($nodes as $node)
+		{
+			$this->appendChild($node);
+		}
+
+		return $this;
+	}
+
+	/**
 	* Sort an array of nodes
 	*
 	* Note that nodes are sorted in place, nothing is returned
