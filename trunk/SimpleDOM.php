@@ -785,10 +785,10 @@ class SimpleDOM extends SimpleXMLElement
 	*
 	* @see sortedXPath
 	*
-	* @param	array	$ret		Array of SimpleXMLElement
+	* @param	array	$nodes		Array of SimpleXMLElement
 	* @return	void
 	*/
-	static public function sort(array &$ret)
+	static public function sort(array &$nodes)
 	{
 		$args = func_get_args();
 		unset($args[0]);
@@ -807,17 +807,17 @@ class SimpleDOM extends SimpleXMLElement
 					/**
 					* If the XPath is current() or text() or . we use this node's textContent
 					*/
-					foreach ($ret as $node)
+					foreach ($nodes as $node)
 					{
 						$tmp[$k][] = dom_import_simplexml($node)->textContent;
 					}
 				}
 				else
 				{
-					foreach ($ret as $node)
+					foreach ($nodes as $node)
 					{
-						$nodes = $node->xpath($arg);
-						$tmp[$k][] = (empty($nodes)) ? '' : (string) $nodes[0];
+						$_nodes = $node->xpath($arg);
+						$tmp[$k][] = (empty($_nodes)) ? '' : (string) $_nodes[0];
 					}
 				}
 			}
@@ -832,7 +832,7 @@ class SimpleDOM extends SimpleXMLElement
 			$sort[] =& $tmp[$k];
 		}
 
-		$sort[] =& $ret;
+		$sort[] =& $nodes;
 
 		call_user_func_array('array_multisort', $sort);
 	}
