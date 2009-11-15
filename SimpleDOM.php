@@ -662,6 +662,76 @@ class SimpleDOM extends SimpleXMLElement
 		return $html;
 	}
 
+	/**
+	* Return all elements with the given class name
+	*
+	* Should work like DOM0's method
+	*
+	* @param	string	$class		Class name
+	* @return	array				Array of SimpleDOM nodes
+	*/
+	public function getElementsByClassName($class)
+	{
+		if (strpos($class, '"') !== false
+		 || strpos($class, "'") !== false)
+		{
+			return array();
+		}
+
+		$xpath = './/*[contains(concat(" ", @class, " "), " ' . htmlspecialchars($class) . ' ")]';
+		return $this->xpath($xpath);
+	}
+
+	/**
+	* Test whether current node has given class
+	*
+	* @param	string	$class		Class name
+	* @return	bool
+	*/
+	public function hasClass($class)
+	{
+		return in_array($class, explode(' ', $this['class']));
+	}
+
+	/**
+	* Add given class to current node
+	*
+	* @param	string		$class	Class name
+	* @return	SimpleDOM			Current node
+	*/
+	public function addClass($class)
+	{
+		if (!$this->hasClass($class))
+		{
+			$current = (string) $this['class'];
+
+			if ($current !== ''
+			 && substr($current, -1) !== ' ')
+			{
+				$this['class'] .= ' ';
+			}
+
+			$this['class'] .= $class;
+		}
+
+		return $this;
+	}
+
+	/**
+	* Remove given class from current node
+	*
+	* @param	string		$class	Class name
+	* @return	SimpleDOM			Current node
+	*/
+	public function removeClass($class)
+	{
+		while ($this->hasClass($class))
+		{
+			$this['class'] = substr(str_replace(' ' . $class . ' ', ' ', ' ' . $this['class'] . ' '), 1, -1);
+		}
+		return $this;
+	}
+
 
 	//=================================
 	// Utilities
