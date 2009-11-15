@@ -760,7 +760,17 @@ class SimpleDOM extends SimpleXMLElement
 	*/
 	public function asPrettyXML($filepath = null)
 	{
-		$xml = dom_import_simplexml($this);
+		/**
+		* Dump and reload this node's XML with LIBXML_NOBLANKS.
+		*
+		* Also import it as a DOMDocument because some older of XSLTProcessor rejected
+		* SimpleXMLElement as a source.
+		*/
+		$xml = dom_import_simplexml(simplexml_load_string(
+			$this->asXML(),
+			get_class($this),
+			LIBXML_NOBLANKS
+		));
 
 		$xsl = new DOMDocument;
 		$xsl->loadXML(
