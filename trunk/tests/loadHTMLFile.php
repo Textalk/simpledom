@@ -74,7 +74,7 @@ class SimpleDOM_TestCase_loadHTMLFile extends PHPUnit_Framework_TestCase
 		$this->assertXmlStringEqualsXmlString($xml, $node->asXML());
 	}
 
-	public function testInvalidHTMLEntityAreMagicallyFixed()
+	public function testInvalidHTMLEntityAreSilentlyFixed()
 	{
 		$html =
 			'<html>
@@ -90,7 +90,7 @@ class SimpleDOM_TestCase_loadHTMLFile extends PHPUnit_Framework_TestCase
 				</body>
 			</html>';
 
-		$node = @SimpleDOM::loadHTMLFile($this->file($html));
+		$node = SimpleDOM::loadHTMLFile($this->file($html));
 
 		$this->assertXmlStringEqualsXmlString($xml, $node->asXML());
 	}
