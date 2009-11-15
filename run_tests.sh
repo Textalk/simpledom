@@ -1,2 +1,2 @@
 #!/bin/bash
-phpunit --coverage-html tests/coverage tests/AllTests.php
+phpunit --coverage-html $(cd $(dirname $0); pwd -P)/tests/coverage $(cd $(dirname $0); pwd -P)/tests/AllTests.php
