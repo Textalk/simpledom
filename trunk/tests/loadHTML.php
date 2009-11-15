@@ -74,7 +74,7 @@ class SimpleDOM_TestCase_loadHTML extends PHPUnit_Framework_TestCase
 		$this->assertXmlStringEqualsXmlString($xml, $node->asXML());
 	}
 
-	public function testInvalidHTMLEntityAreMagicallyFixed()
+	public function testInvalidHTMLEntityAreSilentlyFixed()
 	{
 		$html =
 			'<html>
@@ -90,8 +90,47 @@ class SimpleDOM_TestCase_loadHTML extends PHPUnit_Framework_TestCase
 				</body>
 			</html>';
 
-		$node = @SimpleDOM::loadHTML($html);
+		$node = SimpleDOM::loadHTML($html);
 
 		$this->assertXmlStringEqualsXmlString($xml, $node->asXML());
+	}
+
+	public function testErrorsCanBeRetrieved()
+	{
+		$html =
+			'<html>
+				<body>
+					<p><a href="test?a=1&b=2">link</a>
+					<p><i>not closed
+				</body>
+			</html>';
+
+		$node = SimpleDOM::loadHTML($html, $errors);
+
+		$this->assertType('array', $errors, '$errors was not initialized as an array');
+
+		if (is_array($errors))
+		{
+			$this->assertSame(2, count($errors), '$errors did not contain the expected number of errors');
+
+			$errors = array_values(array_slice($errors, -2));
+
+			$this->assertStringStartsWith("htmlParseEntityRef: expecting ';'", $errors[0]->message);
+			$this->assertStringStartsWith("Opening and ending tag mismatch: body and i", $errors[1]->message);
+		}
+	}
+
+	/**
+	* @depends testErrorsCanBeRetrieved
+	*/
+	public function testOnlyRelevantErrorsAreReturned()
+	{
+		/**
+		* Generate some errors then rerun testErrorsCanBeRetrieved
+		*/
+		$old = libxml_use_internal_errors(true);
+		SimpleDOM::loadHTML('<html><bogus>');
+		$this->testErrorsCanBeRetrieved();
+		libxml_use_internal_errors($old);
 	}
 }
