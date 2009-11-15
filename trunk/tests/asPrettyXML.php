@@ -102,6 +102,26 @@ class SimpleDOM_TestCase_asPrettyXML extends PHPUnit_Framework_TestCase
 		$this->assertSame($expected, $root->asPrettyXML());
 	}
 
+	public function testWhitespaceNodesContainingLineFeedsAreIgnored()
+	{
+		$root = new SimpleDOM('
+			<root>
+				<child1>text <b>bold</b> <i>italic</i></child1>
+				<child2 />
+				<child3 />
+			</root>
+		');
+
+		$expected = '<?xml version="1.0"?>
+<root>
+  <child1>text <b>bold</b> <i>italic</i></child1>
+  <child2/>
+  <child3/>
+</root>';
+
+		$this->assertSame($expected, $root->asPrettyXML());
+	}
+
 	public function testFileIsCreatedOnSuccess()
 	{
 		$root = new SimpleDOM('<root><child /></root>');
