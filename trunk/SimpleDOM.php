@@ -766,9 +766,8 @@ class SimpleDOM extends SimpleXMLElement
 		* Also import it as a DOMDocument because some older of XSLTProcessor rejected
 		* SimpleXMLElement as a source.
 		*/
-		$xml = dom_import_simplexml(simplexml_load_string(
+		$xml = dom_import_simplexml(new SimpleXMLElement(
 			$this->asXML(),
-			get_class($this),
 			LIBXML_NOBLANKS
 		));
 
