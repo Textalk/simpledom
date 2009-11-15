@@ -71,22 +71,26 @@ class SimpleDOM extends SimpleXMLElement
 	* Create a SimpleDOM object from a HTML string
 	*
 	* @param	string		$source		HTML source
+	* @param	mixed		$errors		Passed by reference. Will be replaced by an array of
+	*									LibXMLError objects if applicable
 	* @return	SimpleDOM
 	*/
-	static public function loadHTML($source)
+	static public function loadHTML($source, &$errors = null)
 	{
-		return self::fromHTML('loadHTML', $source);
+		return self::fromHTML('loadHTML', $source, $errors);
 	}
 
 	/**
 	* Create a SimpleDOM object from a HTML file
 	*
-	* @param	string		$filename	HTML file
+	* @param	string		$source		HTML source
+	* @param	mixed		$errors		Passed by reference. Will be replaced by an array of
+	*									LibXMLError objects if applicable
 	* @return	SimpleDOM
 	*/
-	static public function loadHTMLFile($filename)
+	static public function loadHTMLFile($filename, &$errors = null)
 	{
-		return self::fromHTML('loadHTMLFile', $filename);
+		return self::fromHTML('loadHTMLFile', $filename, $errors);
 	}
 
 
@@ -1010,10 +1014,16 @@ class SimpleDOM extends SimpleXMLElement
 	* NOTE: in order to support LSB, __CLASS__ would need to be replaced by get_called_class() and
 	*		this method would need to be invoked via static:: instead of self::
 	*/
-	static protected function fromHTML($method, $arg)
+	static protected function fromHTML($method, $arg, &$errors)
 	{
+		$old = libxml_use_internal_errors(true);
+		$cnt = count(libxml_get_errors());
+
 		$dom = new DOMDocument;
 		$dom->$method($arg);
+
+		$errors = array_slice(libxml_get_errors(), $cnt);
+		libxml_use_internal_errors($old);
 
 		return simplexml_import_dom($dom, __CLASS__);
 	}
