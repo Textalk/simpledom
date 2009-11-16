@@ -492,6 +492,18 @@ class SimpleDOM extends SimpleXMLElement
 		return simplexml_import_dom(dom_import_simplexml($dst), get_class($this))->appendChild($this->removeSelf());
 	}
 
+	/**
+	* Return the first node of the result of an XPath expression
+	*
+	* @param	string	$xpath	XPath expression
+	* @return	mixed			SimpleDOM object if any node was returned, NULL otherwise
+	*/
+	public function firstOf($xpath)
+	{
+		$nodes = $this->xpath($xpath);
+		return (isset($nodes[0])) ? $nodes[0] : null;
+	}
+
 
 	//=================================
 	// DOM extra
