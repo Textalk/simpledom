@@ -40,9 +40,8 @@ class SimpleDOM_TestCase_firstOf extends PHPUnit_Framework_TestCase
 	public function testNoMatch()
 	{
 		$node     = new SimpleDOM('<node><ignore /><child /><child id="15" /></node>');
-		$expected = null;
 		$actual   = $node->firstOf('//nomatch');
 
-		$this->assertSame($expected, $actual);
+		$this->assertNull($actual);
 	}
 }
