@@ -572,22 +572,8 @@ class SimpleDOM extends SimpleXMLElement
 
 		if (!$fragment->appendXML($xml))
 		{
-			/**
-			* Could not append that XML... but why? We are going to check whether
-			* the XML is valid.
-			*/
-			try
-			{
-				$exception = new UnexpectedValueException('DOM could not append XML (reason unknown)');
-				new SimpleXMLElement($xml);
-			}
-			catch (Exception $e)
-			{
-				$exception = new InvalidArgumentException($e->getMessage());
-			}
-
 			libxml_use_internal_errors($use_errors);
-			throw $exception;
+			throw new InvalidArgumentException(libxml_get_last_error()->message);
 		}
 		libxml_use_internal_errors($use_errors);
 
