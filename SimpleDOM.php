@@ -657,6 +657,16 @@ class SimpleDOM extends SimpleXMLElement
 	*/
 	public function innerHTML()
 	{
+		return $this->innerXML();
+	}
+
+	/**
+	* Return the XML content of current node as a string
+	*
+	* @return	string			Content of current node
+	*/
+	public function innerXML()
+	{
 		$dom = dom_import_simplexml($this);
 		$doc = $dom->ownerDocument;
 
@@ -667,6 +677,19 @@ class SimpleDOM extends SimpleXMLElement
 		}
 
 		return $html;
+	}
+
+	/**
+	* Return the XML representing this node and its child nodes
+	*
+	* NOTE: unlike asXML() it doesn't return the XML prolog
+	*
+	* @return	string			Content of current node
+	*/
+	public function outerXML()
+	{
+		$dom = dom_import_simplexml($this);
+		return $dom->ownerDocument->saveXML($dom);
 	}
 
 	/**
