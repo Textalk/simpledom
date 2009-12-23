@@ -76,7 +76,7 @@ class SimpleDOM extends SimpleXMLElement
 	* Create a SimpleDOM object from a HTML string
 	*
 	* @param	string		$source		HTML source
-	* @param	mixed		$errors		Passed by reference. Will be replaced by an array of
+	* @param	mixed		&$errors	Passed by reference. Will be replaced by an array of
 	*									LibXMLError objects if applicable
 	* @return	SimpleDOM
 	*/
@@ -88,8 +88,8 @@ class SimpleDOM extends SimpleXMLElement
 	/**
 	* Create a SimpleDOM object from a HTML file
 	*
-	* @param	string		$source		HTML source
-	* @param	mixed		$errors		Passed by reference. Will be replaced by an array of
+	* @param	string		$filename	Path/URL to HTML file
+	* @param	mixed		&$errors	Passed by reference. Will be replaced by an array of
 	*									LibXMLError objects if applicable
 	* @return	SimpleDOM
 	*/
@@ -920,7 +920,7 @@ class SimpleDOM extends SimpleXMLElement
 	*
 	* @see sortedXPath
 	*
-	* @param	array	$nodes		Array of SimpleXMLElement
+	* @param	array	&$nodes		Array of SimpleXMLElement
 	* @return	void
 	*/
 	static public function sort(array &$nodes)
