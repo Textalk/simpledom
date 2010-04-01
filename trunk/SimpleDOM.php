@@ -784,7 +784,7 @@ class SimpleDOM extends SimpleXMLElement
 	* Return the current node slightly prettified
 	*
 	* Elements will be indented, empty elements will be minified. The result isn't mean to be
-	* perfect, I'm sure there are better prettifier out there.
+	* perfect, I'm sure there are better prettifiers out there.
 	*
 	* @param	string	$filepath	If set, save the result to this file
 	* @return	mixed				If $filepath is set, will return TRUE if the file was
@@ -800,8 +800,7 @@ class SimpleDOM extends SimpleXMLElement
 		* SimpleXMLElement as a source.
 		*/
 		$xml = dom_import_simplexml(new SimpleXMLElement(
-			$this->asXML(),
-			LIBXML_NOBLANKS
+			$this->asXML()
 		));
 
 		$xsl = new DOMDocument;
@@ -810,6 +809,13 @@ class SimpleDOM extends SimpleXMLElement
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 	<xsl:output method="xml" indent="yes" />
+
+	<xsl:template match="text()">
+		<!-- remove everything that contains only whitespace, with at least one LF -->
+		<xsl:if test="not(normalize-space(.) = \'\' and contains(., \'&#10;\'))">
+			<xsl:value-of select="."/>
+		</xsl:if>
+	</xsl:template>
 
 	<xsl:template match="node()">
 		<xsl:copy>
