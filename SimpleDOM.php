@@ -657,16 +657,6 @@ class SimpleDOM extends SimpleXMLElement
 	*/
 	public function innerHTML()
 	{
-		return $this->innerXML();
-	}
-
-	/**
-	* Return the XML content of current node as a string
-	*
-	* @return	string			Content of current node
-	*/
-	public function innerXML()
-	{
 		$dom = dom_import_simplexml($this);
 		$doc = $dom->ownerDocument;
 
@@ -677,6 +667,19 @@ class SimpleDOM extends SimpleXMLElement
 		}
 
 		return $html;
+	}
+
+	/**
+	* Return the XML content of current node as a string
+	*
+	* @return	string			Content of current node
+	*/
+	public function innerXML()
+	{
+		$xml = $this->outerXML();
+		$pos = 1 + strpos($xml, '>');
+		$len = strrpos($xml, '<') - $pos;
+		return substr($xml, $pos, $len);
 	}
 
 	/**
