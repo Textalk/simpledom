@@ -946,7 +946,25 @@ class SimpleDOM extends SimpleXMLElement
 			{
 				$tmp[$k] = array();
 
-				if (preg_match('#^current\\(\\)|text\\(\\)|\\.$#i', $arg))
+				if (preg_match('#^@?[a-z_0-9]+$#Di', $arg))
+				{
+					if ($arg[0] === '@')
+					{
+						$name = substr($arg, 1);
+						foreach ($nodes as $node)
+						{
+							$tmp[$k][] = (string) $node[$name];
+						}
+					}
+					else
+					{
+						foreach ($nodes as $node)
+						{
+							$tmp[$k][] = (string) $node->$arg;
+						}
+					}
+				}
+				elseif (preg_match('#^current\\(\\)|text\\(\\)|\\.$#i', $arg))
 				{
 					/**
 					* If the XPath is current() or text() or . we use this node's textContent
