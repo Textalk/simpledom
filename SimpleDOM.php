@@ -832,10 +832,11 @@ class SimpleDOM extends SimpleXMLElement
   }
 
   /**
-   * Return the current node slightly prettified
+   * Return a prettified version of the current node
    *
-   * Elements will be indented, empty elements will be minified. The result isn't mean to be
-   * perfect, I'm sure there are better prettifiers out there.
+   * Use the built-in formatting functionality in DOMDocument. The use of
+   * preserveWhiteSpace = false may cause problems in some cases, but for now
+   * it works well enough.
    *
    * @param  string $filepath If set, save the result to this file
    * @return mixed            If $filepath is set, will return TRUE if the file was
@@ -844,43 +845,11 @@ class SimpleDOM extends SimpleXMLElement
    */
   public function asPrettyXML($filepath = null)
   {
-    /**
-     * Dump and reload this node's XML with LIBXML_NOBLANKS.
-     *
-     * Also import it as a DOMDocument because some older of XSLTProcessor rejected
-     * SimpleXMLElement as a source.
-     */
-    $xml = dom_import_simplexml(new SimpleXMLElement(
-        $this->asXML()
-    ));
-
-    $xsl = new DOMDocument;
-    $xsl->loadXML(
-        '<?xml version="1.0" encoding="utf-8"?>
-        <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-
-          <xsl:output method="xml" indent="yes" />
-
-          <xsl:template match="text()">
-            <!-- remove everything that contains only whitespace, with at least one LF -->
-            <xsl:if test="not(normalize-space(.) = \'\' and contains(., \'&#10;\'))">
-              <xsl:value-of select="."/>
-            </xsl:if>
-          </xsl:template>
-
-          <xsl:template match="node()">
-            <xsl:copy>
-              <xsl:copy-of select="@*" />
-              <xsl:apply-templates />
-            </xsl:copy>
-          </xsl:template>
-
-        </xsl:stylesheet>');
-
-    $xslt = new XSLTProcessor;
-    $xslt->importStylesheet($xsl);
-
-    $result = trim($xslt->transformToXML($xml));
+    $dom = new DOMDocument;
+    $dom->preserveWhiteSpace = false;
+    $dom->formatOutput = true;
+    $dom->loadXML($this->asXML());
+    $result = $dom->saveXML();
 
     if (isset($filepath)) {
       return (bool)file_put_contents($filepath, $result);
