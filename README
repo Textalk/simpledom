@@ -1,0 +1,9 @@
+SimpleDOM, a PHP wrapper for SimpleXML and the DOM classes
+==========================================================
+
+It is messy to work with XML dom structures in PHP. Most things are handled
+by SimpleXML, but sometimes the various DOM classes must be used instead.
+SimpleDOM does most of this transparently, so you don't have to think about it.
+
+The code is originally a fork from https://code.google.com/p/simpledom/, with
+changes and additions by Textalk.
